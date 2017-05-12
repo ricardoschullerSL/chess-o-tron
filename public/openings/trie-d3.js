@@ -98,7 +98,7 @@ function draw(graph) {
 		.data(graph.nodes)
 		.enter().append("g")
 		.attr("class", "node")
-		.call(simulation.drag);
+		.call(d3.drag().on("start", started));
 
 
 	node.on("dblclick.zoom", function(d) {
