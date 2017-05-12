@@ -23,18 +23,18 @@ var focus_node = null,
 var text_center = false;
 var outline = false;
 
-var color = d3.scale.linear()
+var color = d3.scaleLinear()
 	.domain([0, 0.5, 1])
 	.range(["red", "grey", "lime"]);
 
 var highlight_color = "blue";
 var highlight_trans = 0.1;
 
-var size = d3.scale.pow().exponent(1)
+var size = d3.scalePow().exponent(1)
 	.domain([1, 100])
 	.range([8, 24]);
 
-var force = d3.layout.force()
+var force = d3.forceSimulation()
 	.linkDistance(10)
 	.charge(-150)
 	.size([w, h]);
@@ -51,14 +51,14 @@ var min_zoom = 0.1;
 var max_zoom = 7;
 d3.select("svg").remove();
 var svg = d3.select("#graph").append("svg");
-var zoom = d3.behavior.zoom().scaleExtent([min_zoom, max_zoom]);
+var zoom = d3.zoom().scaleExtent([min_zoom, max_zoom]);
 var g = svg.append("g");
 svg.style("cursor", "move");
 
 
 function draw(graph) {
 	svg.selectAll('*').remove();
-	zoom = d3.behavior.zoom().scaleExtent([min_zoom, max_zoom]);
+	zoom = d3.zoom().scaleExtent([min_zoom, max_zoom]);
 	g = svg.append("g");
 	svg.style("cursor", "move");
 
@@ -270,7 +270,7 @@ function draw(graph) {
 
 		var base_radius = nominal_base_node_size;
 		if (nominal_base_node_size * zoom.scale() > max_base_node_size) base_radius = max_base_node_size / zoom.scale();
-		circle.attr("d", d3.svg.symbol()
+		circle.attr("d", d3.symbol()
 			.size(function(d) {
 				return Math.PI * Math.pow(size(d.size) * base_radius / nominal_base_node_size || base_radius, 2);
 			})
