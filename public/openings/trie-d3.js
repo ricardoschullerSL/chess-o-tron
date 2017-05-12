@@ -2,6 +2,7 @@
 
 var w = window.innerWidth;
 var h = window.innerHeight;
+var simulation;
 
 var keyc = true,
 	keys = true,
@@ -72,11 +73,10 @@ function draw(graph) {
 		return linkedByIndex[a.index + "," + b.index] || linkedByIndex[b.index + "," + a.index] || a.index == b.index;
 	}
 
-	var simulation = d3.forceSimulation(graph.nodes)
+	simulation = d3.forceSimulation(graph.nodes)
 		.force("charge", d3.forceManyBody().strength(-150))
-		.force("link", d3.forceLink(graph.links))
+		.force("link", d3.forceLink(graph.links).distance(10))
 		.alpha(100000.1)
-		.start();
 
 	setTimeout(function() {
 		simulation.gravity(0.11).friction(0.9).start();
