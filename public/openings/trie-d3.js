@@ -34,11 +34,12 @@ var size = d3.scalePow().exponent(1)
 	.domain([1, 100])
 	.range([8, 24]);
 
-var force = d3.forceSimulation()
-	.linkDistance(10)
+
+	/*
+	linkDistance(10)
 	.charge(-150)
 	.size([w, h]);
-
+	*/
 var default_node_color = "#ccc";
 var default_link_color = "#888";
 var nominal_base_node_size = 2;
@@ -71,14 +72,14 @@ function draw(graph) {
 		return linkedByIndex[a.index + "," + b.index] || linkedByIndex[b.index + "," + a.index] || a.index == b.index;
 	}
 
-	force
-		.nodes(graph.nodes)
-		.links(graph.links)
+	var simulation = d3.forceSimulation(graph.nodes)
+		.force("charge", d3.forceManyBody().strength(-150))
+		.force("link", d3.forceLink(links))
 		.alpha(100000.1)
 		.start();
 
 	setTimeout(function() {
-		force.gravity(0.11).friction(0.9).start();
+		simulation.gravity(0.11).friction(0.9).start();
 	}, 2000);
 	
 	
@@ -97,7 +98,7 @@ function draw(graph) {
 		.data(graph.nodes)
 		.enter().append("g")
 		.attr("class", "node")
-		.call(force.drag);
+		.call(simulation.drag);
 
 
 	node.on("dblclick.zoom", function(d) {
@@ -296,7 +297,7 @@ function draw(graph) {
 	//window.focus();
 	d3.select(window).on("resize", resize);
 
-	force.on("tick", function(e) {
+	simulation.on("tick", function(e) {
 
 		//		var k = 6 * e.alpha;
 
@@ -335,7 +336,7 @@ function draw(graph) {
 			height = window.innerHeight;
 		svg.attr("width", width).attr("height", height);
 
-		force.size([force.size()[0] + (width - w) / zoom.scale(), force.size()[1] + (height - h) / zoom.scale()]).resume();
+		simulation.size([simulation.size()[0] + (width - w) / zoom.scale(), simulation.size()[1] + (height - h) / zoom.scale()]).resume();
 		w = width;
 		h = height;
 	}
@@ -348,11 +349,11 @@ function isNumber(n) {
 }
 
 function compact() {
-	force.gravity(0.11).friction(0.9).start();
+	simulation.gravity(0.11).friction(0.9).start();
 }
 
 function extend() {
-	force.gravity(0.005).friction(0.95).start();
+	simulation.gravity(0.005).friction(0.95).start();
 }
 
 	
