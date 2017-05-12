@@ -74,7 +74,7 @@ function draw(graph) {
 
 	var simulation = d3.forceSimulation(graph.nodes)
 		.force("charge", d3.forceManyBody().strength(-150))
-		.force("link", d3.forceLink(links))
+		.force("link", d3.forceLink(graph.links))
 		.alpha(100000.1)
 		.start();
 
