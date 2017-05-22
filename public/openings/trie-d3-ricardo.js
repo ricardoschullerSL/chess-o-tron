@@ -9,10 +9,6 @@ function draw(graph) {
     var range = 100
     var data = graph; 
     console.log(data);
-    // {
-    //     nodes:d3.range(0, range).map(function(d){ return {label: "l"+d ,r:~~d3.randomUniform(8, 28)()}}),
-    //     links:d3.range(0, range).map(function(){ return {source:~~d3.randomUniform(range)(), target:~~d3.randomUniform(range)()} })        
-    // }
     setSize(data)
     drawChart(data)    
 }
@@ -59,19 +55,45 @@ function drawChart(data) {
         .append("line")
         .attr("stroke", "black")
     
-    var node = svg.append("g")
+    var nodes = svg.append("g")
         .attr("class", "nodes")
-        .selectAll("circle")
+        .selectAll("nodes")
         .data(data.nodes)
-        .enter().append("circle")
-        .attr("r", function(d){  return Math.abs(d.size/4) })
-        .attr("class", function(d) { return d.type})
+    
+    var nodes_enter = nodes.enter()
+        .append("g")
+        .attr("class", "node")
         .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
-            .on("end", dragended));    
+            .on("end", dragended)); 
+            
+    nodes_enter.append("path")
+        .style("stroke", "steelblue")
+        .style("fill", "red")
+        .attr("d", d3.symbol()
+                    .size(function (d) {if (d.size !== "MNaN,0") return d.size * 10
+                                        else return 50})
+                    .type(function (d) {
+                        if (d.type === "circle") return d3.symbolCircle 
+                        else if (d.type === "cross") return d3.symbolCross
+                        else return d3.symbolDiamond })
+        ).append("text")
+        .attr("dy", ".35em")
+        .text(function (d) {return "test"});
     
+
+        // .attr("d", d3.symbol().type(d3.symbolCircle))
+        //.attr("transform", function(d) { return "translate("+ d.x +"," + d.y +")"})    
+
+        // .attr("transform", function(d) {
+        //     console.log(d);
+        //     console.log(d.x, d.y, d.size, d.id);
+        //     return "translate(" + d.x + "," + d.y + ")";
+        // })
     
+        
+
     var ticked = function() {
         link
             .attr("x1", function(d) { return d.source.x; })
@@ -79,9 +101,14 @@ function drawChart(data) {
             .attr("x2", function(d) { return d.target.x; })
             .attr("y2", function(d) { return d.target.y; });
 
-        node
+        nodes
             .attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
+        
+        svg.selectAll("path")
+            .attr("transform", function (d) {
+                return "translate(" + d.x + ", " +d.y +")"
+            })
     }  
     
      
@@ -91,6 +118,7 @@ function drawChart(data) {
 
     simulation.force("link")
         .links(data.links);    
+    
     
     
     function dragstarted(d) {
