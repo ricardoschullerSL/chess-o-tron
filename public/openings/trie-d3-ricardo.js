@@ -37,12 +37,14 @@ function setSize(data) {
 
 function drawChart(data) {
     
-    var color = d3.scaleLinear();
+    var color = d3.scaleLinear()
+    	.domain([0, 0.5, 1])
+    	.range(["red", "grey", "lime"]);
          
     var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().strength(1.5).id(function(d) { return d.index }))
+        .force("link", d3.forceLink().strength(2).id(function(d) { return d.index }))
         .force("collide",d3.forceCollide( function(d){return d.r + 8 }).iterations(16) )
-        .force("charge", d3.forceManyBody().strength(-150))
+        .force("charge", d3.forceManyBody().strength(-200))
         .force("center", d3.forceCenter(chartWidth / 2, chartWidth / 2))
         .force("y", d3.forceY(0))
         .force("x", d3.forceX(0))
@@ -69,30 +71,21 @@ function drawChart(data) {
             .on("end", dragended)); 
             
     nodes_enter.append("path")
-        .style("stroke", "steelblue")
-        .style("fill", "red")
+        .style("stroke", "black")
+        .style("fill", function (d) {return color(d.score)})
         .attr("d", d3.symbol()
-                    .size(function (d) {if (d.size !== "MNaN,0") return d.size * 10
+                    .size(function (d) {if (d.size) return d.size * 10
                                         else return 50})
                     .type(function (d) {
                         if (d.type === "circle") return d3.symbolCircle 
                         else if (d.type === "cross") return d3.symbolCross
                         else return d3.symbolDiamond })
-        ).append("text")
-        .attr("dy", ".35em")
-        .text(function (d) {return "test"});
-    
-
-        // .attr("d", d3.symbol().type(d3.symbolCircle))
-        //.attr("transform", function(d) { return "translate("+ d.x +"," + d.y +")"})    
-
-        // .attr("transform", function(d) {
-        //     console.log(d);
-        //     console.log(d.x, d.y, d.size, d.id);
-        //     return "translate(" + d.x + "," + d.y + ")";
-        // })
-    
+        )
         
+    nodes_enter.append("text")
+        .attr("dy", ".35em")
+        .text(function (d) {return d.id});
+
 
     var ticked = function() {
         link
@@ -107,6 +100,11 @@ function drawChart(data) {
         
         svg.selectAll("path")
             .attr("transform", function (d) {
+                return "translate(" + d.x + ", " +d.y +")"
+            })
+        
+        svg.selectAll("text")
+            .attr("transform", function(d) {
                 return "translate(" + d.x + ", " +d.y +")"
             })
     }  
