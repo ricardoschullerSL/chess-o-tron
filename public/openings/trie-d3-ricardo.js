@@ -5,12 +5,17 @@ var svg = d3.select("#graph").append("svg")
 var chartLayer = svg.append("g").classed("chartLayer", true)
 
 
-function draw(graph) {
-    var range = 100
-    var data = graph; 
+function draw(data) {
+     
     console.log(data);
-    setSize(data)
-    drawChart(data)    
+    emptyChart(data);
+    setSize(data);
+    drawChart(data);    
+}
+
+function emptyChart() {
+    d3.selectAll(".nodes").remove();
+    d3.selectAll(".links").remove();
 }
 
 function setSize(data) {
@@ -42,9 +47,9 @@ function drawChart(data) {
     	.range(["red", "grey", "lime"]);
          
     var simulation = d3.forceSimulation()
-        .force("link", d3.forceLink().strength(2).id(function(d) { return d.index }))
+        .force("link", d3.forceLink().strength(3).id(function(d) { return d.index }))
         .force("collide",d3.forceCollide( function(d){return d.r + 8 }).iterations(16) )
-        .force("charge", d3.forceManyBody().strength(-200))
+        .force("charge", d3.forceManyBody().strength(-75))
         .force("center", d3.forceCenter(chartWidth / 2, chartWidth / 2))
         .force("y", d3.forceY(0))
         .force("x", d3.forceX(0))
@@ -85,6 +90,18 @@ function drawChart(data) {
     nodes_enter.append("text")
         .attr("dy", ".35em")
         .text(function (d) {return d.id});
+        
+    d3.selectAll(".node").on("click", clicked)
+    
+    function clicked(d, i) {
+        if (d3.event.defaultPrevented) return;
+        if (d.url) {
+            setTimeout(function() {
+                window.open(d.url, '_blank');
+            }, 200);
+        }
+        
+    }
 
 
     var ticked = function() {
